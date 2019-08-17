@@ -7,14 +7,15 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.use('/graphql', graphqlHttp({
+app.use('/graphql',
+ graphqlHttp({
     schema: buildSchema(`
         type RootQuery {
-            events: [String]
+            events: [String!]!
         }
 
         type RootMutation {
-            
+            createEvent(none: String): String
         }
 
         schema {
@@ -22,7 +23,15 @@ app.use('/graphql', graphqlHttp({
             mutation: RootMutation
         }
     `),
-    rootValue: {}
+    rootValue: {
+        events: () => {
+            return ['Dolar Compra', 'Dolar Venta', 'Euro Compra']
+        },
+        createEvent: (args) => {
+            const eventName = args.name;
+            return eventName;
+        }
+    }
 }));
 
 app.get('/', (req, res, next) => {
